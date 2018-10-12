@@ -22,10 +22,6 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <java.version>1.8</java.version>
-    <INSTANCE_CONNECTION_NAME>credible-nation-130012:europe-west1:users</INSTANCE_CONNECTION_NAME>
-    <user>root</user>
-    <password>password</password>
-    <database>users</database>
   </properties>
 
   <dependencies>
