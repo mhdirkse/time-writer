@@ -6,7 +6,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import com.github.mhdirkse.timewriter.UserInfoRepository;
-import com.github.mhdirkse.timewriter.UserNotFoundException;
 import com.github.mhdirkse.timewriter.UserPrincipal;
 import com.github.mhdirkse.timewriter.model.UserInfo;
 
@@ -18,7 +17,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserInfo user = userInfoRepository.findByUsername(username);
         if(user == null) {
-            throw new UserNotFoundException(username);
+            throw new UsernameNotFoundException(username);
         }
         return new UserPrincipal(user);
     }
