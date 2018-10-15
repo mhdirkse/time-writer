@@ -7,4 +7,5 @@ import com.github.mhdirkse.timewriter.model.UserInfo;
 
 @Repository
 public interface UserInfoRepository extends JpaRepository<UserInfo, Long> {
+    public UserInfo findByUsername(String username);
 }
