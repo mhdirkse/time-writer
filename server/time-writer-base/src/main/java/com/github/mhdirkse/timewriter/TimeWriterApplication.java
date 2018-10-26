@@ -3,8 +3,11 @@ package com.github.mhdirkse.timewriter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 @SpringBootApplication
 public class TimeWriterApplication {
@@ -20,5 +23,10 @@ public class TimeWriterApplication {
 	@Bean
 	AuthenticationFailureHandler authenticationFailureHandler() {
 	    return new SimpleUrlAuthenticationFailureHandler();
+	}
+
+	@Bean
+	LogoutSuccessHandler logoutSuccessHandler() {
+	    return new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK);
 	}
 }
