@@ -48,23 +48,47 @@ public class SecurityTest {
 
     @Test
     public void helloWithLoginSucceeds() throws Exception {
-        String cookie = login();
+        String cookie = login("password");
         hello(h -> h.add(HttpHeaders.COOKIE, cookie), HttpStatus.OK);
         logout();
     }
 
-    private String login() {
+    @Test
+    public void loginWithInvalidCredentialsFails() {
+        ResponseEntity<String> response = sendLogin("invalidPassword");
+        assertThat(response.getStatusCode(), equalTo(HttpStatus.UNAUTHORIZED));
+    }
+
+    @Test
+    public void whenLoginFailedThenHelloFails() {
+        ResponseEntity<String> response = sendLogin("invalidPassword");
+        assertThat(response.getStatusCode(), equalTo(HttpStatus.UNAUTHORIZED));
+        String cookie = extractCookie(response);
+        hello(h -> h.add(HttpHeaders.COOKIE, cookie), HttpStatus.UNAUTHORIZED);
+    }
+
+    private String login(String password) {
+        ResponseEntity<String> loginResponse = sendLogin(password);
+        assertThat(loginResponse.getStatusCode(), equalTo(HttpStatus.OK));
+        String cookieHeaderValue = extractCookie(loginResponse);
+        logger.info("Cookie header value: " + cookieHeaderValue);
+        return cookieHeaderValue;
+    }
+
+    private ResponseEntity<String> sendLogin(String password) {
         LoginRequest loginRequest = new LoginRequest();
         loginRequest.setUsername("username");
-        loginRequest.setPassword("password");
+        loginRequest.setPassword(password);
         HttpEntity<LoginRequest> loginRequestEntity = new HttpEntity<>(loginRequest);
         ResponseEntity<String> loginResponse = template.postForEntity(base + "login", loginRequestEntity, String.class);
-        assertThat(loginResponse.getStatusCode(), equalTo(HttpStatus.OK));
+        return loginResponse;
+    }
+
+    private String extractCookie(ResponseEntity<String> loginResponse) {
         HttpHeaders headers = loginResponse.getHeaders();
         String cookieHeaderKey = HttpHeaders.SET_COOKIE;
         logger.info("Cookie header key: " + cookieHeaderKey);
         String cookieHeaderValue = headers.getFirst(cookieHeaderKey);
-        logger.info("Cookie header value: " + cookieHeaderValue);
         return cookieHeaderValue;
     }
 
