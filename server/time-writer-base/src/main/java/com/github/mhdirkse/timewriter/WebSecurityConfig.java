@@ -69,7 +69,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .addFilterAt(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeRequests()
                 .antMatchers("/", "/home.html", "/h2-console/**").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/users/").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/users").permitAll()
                 .anyRequest().authenticated()
                 .and()
             .exceptionHandling()

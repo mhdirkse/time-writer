@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.github.mhdirkse.timewriter.model.UserInfo;
 
 @RestController
-@RequestMapping("/api/users/")
+@RequestMapping("/api/users")
 public class UserController {
     private UserInfoRepository userInfoRepository;
 
@@ -33,24 +33,28 @@ public class UserController {
         }
     }
 
-    @PutMapping("{id}")
+    @PutMapping("/{id}")
     ResponseEntity<UserInfo> modifyUser(
             @PathVariable long id,
             @RequestBody UserInfo user,
             UserPrincipal loggedUser) {
-        if(!isValid(id, user, loggedUser)) {
+        if(user.getId().longValue() != id) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        if(!isValid(id, user, loggedUser)) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
         return new ResponseEntity<>(userInfoRepository.save(user), HttpStatus.OK);
     }
 
     private boolean isValid(long id, UserInfo user, UserPrincipal loggedUser) {
-        boolean idMatch = (user.getId().longValue() == id);
-        boolean rightUser = (user.getUsername().equals(loggedUser.getUsername()));
-        return Boolean.logicalAnd(idMatch, rightUser);
+        if(!loggedUser.hasUser()) {
+            return false;
+        }
+        return (user.getUsername().equals(loggedUser.getUsername()));
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<UserInfo> deleteUser(@PathVariable Long id, UserPrincipal loggedUser) {
         Optional<UserInfo> deletedUser = userInfoRepository.findById(id);
         if(deletedUser.isPresent() && deletedUser.get().getUsername().equals(loggedUser.getUsername())) {

@@ -9,10 +9,17 @@ import com.github.mhdirkse.timewriter.model.UserInfo;
 
 public class UserPrincipal implements UserDetails {
     private static final long serialVersionUID = 2846857548165677180L;
-    private UserInfo user;
+    private UserInfo user = null;
+
+    public UserPrincipal() {
+    }
 
     public UserPrincipal(UserInfo user) {
         this.user = user;
+    }
+
+    public boolean hasUser() {
+        return user != null;
     }
 
     @Override

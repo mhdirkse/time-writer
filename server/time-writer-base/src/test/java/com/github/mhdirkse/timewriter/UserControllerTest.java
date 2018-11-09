@@ -85,11 +85,19 @@ public class UserControllerTest {
     }
 
     @Test
+    public void whenLoggedOutThenUpdateFails() {
+        long id = 1L;
+        UserInfo modification = getUserInfoWithId(id);
+        ResponseEntity<UserInfo> response = instance.modifyUser(id, modification, new UserPrincipal());
+        Assert.assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+    }
+
+    @Test
     public void whenUpdateUserDiffersFromPrincipalThenUpdateFails() {
         long id = 1L;
         UserInfo modification = getUserInfoWithId(id);
         ResponseEntity<UserInfo> response = instance.modifyUser(id, modification, getPrincipal("different"));
-        Assert.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        Assert.assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
     }
 
     private UserInfo getUserInfoWithId(long id) {
