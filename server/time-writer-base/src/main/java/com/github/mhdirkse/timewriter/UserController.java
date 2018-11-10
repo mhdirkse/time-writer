@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,7 +38,7 @@ public class UserController {
     ResponseEntity<UserInfo> modifyUser(
             @PathVariable long id,
             @RequestBody UserInfo user,
-            UserPrincipal loggedUser) {
+            @AuthenticationPrincipal UserPrincipal loggedUser) {
         if(user.getId().longValue() != id) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -55,7 +56,9 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<UserInfo> deleteUser(@PathVariable Long id, UserPrincipal loggedUser) {
+    public ResponseEntity<UserInfo> deleteUser(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserPrincipal loggedUser) {
         Optional<UserInfo> deletedUser = userInfoRepository.findById(id);
         if(deletedUser.isPresent() && deletedUser.get().getUsername().equals(loggedUser.getUsername())) {
             userInfoRepository.delete(deletedUser.get());
@@ -65,3 +68,4 @@ public class UserController {
         }
     }
 }
+
