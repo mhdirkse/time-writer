@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,7 +26,7 @@ public class UserController {
     }
 
     @PostMapping
-    ResponseEntity<UserInfo> addUser(@RequestBody UserInfo user) {
+    public ResponseEntity<UserInfo> addUser(@RequestBody UserInfo user) {
         UserInfo existingUser = userInfoRepository.findByUsername(user.getUsername());
         if (existingUser != null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -35,7 +36,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<UserInfo> modifyUser(
+    public ResponseEntity<UserInfo> modifyUser(
             @PathVariable long id,
             @RequestBody UserInfo user,
             @AuthenticationPrincipal UserPrincipal loggedUser) {
@@ -52,6 +53,9 @@ public class UserController {
         if(!loggedUser.hasUser()) {
             return false;
         }
+        if(loggedUser.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
+            return userInfoRepository.findById(id).isPresent();
+        }
         return (user.getUsername().equals(loggedUser.getUsername()));
     }
 
@@ -60,7 +64,7 @@ public class UserController {
             @PathVariable Long id,
             @AuthenticationPrincipal UserPrincipal loggedUser) {
         Optional<UserInfo> deletedUser = userInfoRepository.findById(id);
-        if(deletedUser.isPresent() && deletedUser.get().getUsername().equals(loggedUser.getUsername())) {
+        if(deletedUser.isPresent() && isValid(id, deletedUser.get(), loggedUser)) {
             userInfoRepository.delete(deletedUser.get());
             return new ResponseEntity<>(HttpStatus.OK);
         } else {

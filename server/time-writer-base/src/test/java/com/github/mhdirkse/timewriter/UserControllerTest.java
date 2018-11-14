@@ -19,6 +19,7 @@ import com.github.mhdirkse.timewriter.model.UserInfo;
 @RunWith(MockitoJUnitRunner.class)
 public class UserControllerTest {
     private static final String USERNAME = "username";
+    private static final String ADMIN = "admin";
 
     @Mock
     private UserInfoRepository userInfoRepository;
@@ -100,6 +101,20 @@ public class UserControllerTest {
         Assert.assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
     }
 
+    @Test
+    public void whenAdminLoggedInThenAnyUserCanBeUpdated() {
+        long id = 1L;
+        UserInfo original = getUserInfoWithId(id);
+        UserInfo modification = getUserInfoWithId(id);
+        UserInfo savedModification = getUserInfoWithId(id);
+        when(userInfoRepository.findById(id)).thenReturn(Optional.of(original));
+        when(userInfoRepository.save(modification)).thenReturn(savedModification);
+        ResponseEntity<UserInfo> response = instance.modifyUser(id, modification, getPrincipal(ADMIN));
+        Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
+        Assert.assertEquals(savedModification, response.getBody());
+        verify(userInfoRepository).save(modification);        
+    }
+
     private UserInfo getUserInfoWithId(long id) {
         UserInfo userInfo = getUserInfo();
         userInfo.setId(id);
@@ -125,5 +140,15 @@ public class UserControllerTest {
         when(userInfoRepository.findById(1L)).thenReturn(Optional.of(userToDelete));
         ResponseEntity<UserInfo> response = instance.deleteUser(1L, new UserPrincipal(loggedUser));
         Assert.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
+
+    @Test
+    public void whenLoggedUserIsAdminThenAnyUserCanBeDeleted() {
+        long id = 1L;
+        UserInfo userToDelete = getUserInfoWithId(id);
+        when(userInfoRepository.findById(id)).thenReturn(Optional.<UserInfo>of(userToDelete));
+        ResponseEntity<UserInfo> response = instance.deleteUser(id, getPrincipal(ADMIN));
+        verify(userInfoRepository).delete(userToDelete);
+        Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 }

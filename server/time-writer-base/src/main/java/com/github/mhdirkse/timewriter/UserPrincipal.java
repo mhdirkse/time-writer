@@ -1,8 +1,11 @@
 package com.github.mhdirkse.timewriter;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.github.mhdirkse.timewriter.model.UserInfo;
@@ -24,8 +27,11 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // TODO Auto-generated method stub
-        return null;
+        List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
+        if(hasUser() && user.getUsername().equals("admin")) {
+            grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        }
+        return grantedAuthorities;
     }
 
     @Override

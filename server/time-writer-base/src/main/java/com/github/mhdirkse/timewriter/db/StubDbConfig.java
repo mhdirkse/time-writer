@@ -9,4 +9,9 @@ class StubDbConfig {
     public SecurityRefinerForH2 securityRefinerForH2() {
         return new SecurityRefinerForH2Impl();
     }
+
+    @Bean
+    public DataInitializerForH2 dataInitializerForH2() {
+        return new DataInitializerForH2Impl();
+    }
 }
