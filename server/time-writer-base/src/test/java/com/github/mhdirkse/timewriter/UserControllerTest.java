@@ -76,8 +76,10 @@ public class UserControllerTest {
     @Test
     public void whenUpdateRequestOkThenUpdated() {
         long id = 1L;
+        UserInfo original = getUserInfoWithId(id);
         UserInfo modification = getUserInfoWithId(id);
         UserInfo savedModification = getUserInfoWithId(id);
+        when(userInfoRepository.findById(id)).thenReturn(Optional.of(original));
         when(userInfoRepository.save(modification)).thenReturn(savedModification);
         ResponseEntity<UserInfo> response = instance.modifyUser(id, modification, getPrincipal(USERNAME));
         Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -88,6 +90,8 @@ public class UserControllerTest {
     @Test
     public void whenLoggedOutThenUpdateFails() {
         long id = 1L;
+        UserInfo original = getUserInfoWithId(id);
+        when(userInfoRepository.findById(id)).thenReturn(Optional.of(original));
         UserInfo modification = getUserInfoWithId(id);
         ResponseEntity<UserInfo> response = instance.modifyUser(id, modification, new UserPrincipal());
         Assert.assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
@@ -96,7 +100,9 @@ public class UserControllerTest {
     @Test
     public void whenUpdateUserDiffersFromPrincipalThenUpdateFails() {
         long id = 1L;
+        UserInfo original = getUserInfoWithId(id);
         UserInfo modification = getUserInfoWithId(id);
+        when(userInfoRepository.findById(id)).thenReturn(Optional.<UserInfo>of(original));
         ResponseEntity<UserInfo> response = instance.modifyUser(id, modification, getPrincipal("different"));
         Assert.assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
     }
@@ -113,6 +119,15 @@ public class UserControllerTest {
         Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assert.assertEquals(savedModification, response.getBody());
         verify(userInfoRepository).save(modification);        
+    }
+
+    @Test
+    public void whenAdminTriesToUpdateNonexistentUserThenBadRequest() {
+        long id = 1L;
+        UserInfo original = getUserInfoWithId(id);
+        when(userInfoRepository.findById(id)).thenReturn(Optional.<UserInfo>empty());
+        ResponseEntity<UserInfo> response = instance.modifyUser(id, original, getPrincipal(ADMIN));
+        Assert.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
     private UserInfo getUserInfoWithId(long id) {
@@ -139,7 +154,7 @@ public class UserControllerTest {
         loggedUser.setUsername("different");
         when(userInfoRepository.findById(1L)).thenReturn(Optional.of(userToDelete));
         ResponseEntity<UserInfo> response = instance.deleteUser(1L, new UserPrincipal(loggedUser));
-        Assert.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        Assert.assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
     }
 
     @Test
@@ -150,5 +165,13 @@ public class UserControllerTest {
         ResponseEntity<UserInfo> response = instance.deleteUser(id, getPrincipal(ADMIN));
         verify(userInfoRepository).delete(userToDelete);
         Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    public void whenAdminTriesToDeleteNonexistentUserThenBadRequest() {
+        long id = 1L;
+        when(userInfoRepository.findById(id)).thenReturn(Optional.<UserInfo>empty());
+        ResponseEntity<UserInfo> response = instance.deleteUser(id,  getPrincipal(ADMIN));
+        Assert.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 }

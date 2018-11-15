@@ -2,9 +2,9 @@ package com.github.mhdirkse.timewriter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.github.mhdirkse.timewriter.db.DataInitializerForH2;
 import com.github.mhdirkse.timewriter.model.UserInfo;
@@ -27,6 +27,7 @@ public class AdminUserInitializer implements CommandLineRunner {
     }
 
     @Override
+    @Transactional
     public void run(String... args) throws Exception {
         logger.debug("Putting initial data if userRepository empty");
         if(userRepository.count() == 0) {
