@@ -6,7 +6,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.github.mhdirkse.timewriter.db.DataInitializerForH2;
+import com.github.mhdirkse.timewriter.h2.DataInitializerForH2;
 import com.github.mhdirkse.timewriter.model.UserInfo;
 
 @Component

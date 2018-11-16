@@ -1,4 +1,4 @@
-package com.github.mhdirkse.timewriter;
+package com.github.mhdirkse.timewriter.model;
 
 import lombok.Getter;
 import lombok.Setter;

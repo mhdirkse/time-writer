@@ -1,4 +1,4 @@
-package com.github.mhdirkse.timewriter.db;
+package com.github.mhdirkse.timewriter.h2;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -16,7 +16,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
-import com.github.mhdirkse.timewriter.db.SecurityRefinerForH2;
+import com.github.mhdirkse.timewriter.auth.AuthenticationFilter;
+import com.github.mhdirkse.timewriter.auth.RestAuthenticationEntryPoint;
+import com.github.mhdirkse.timewriter.h2.SecurityRefinerForH2;
 
 @Configuration
 @EnableWebSecurity

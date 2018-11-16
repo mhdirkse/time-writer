@@ -13,7 +13,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import com.github.mhdirkse.timewriter.db.DataInitializerForH2;
+import com.github.mhdirkse.timewriter.h2.DataInitializerForH2;
 import com.github.mhdirkse.timewriter.model.UserInfo;
 
 @RunWith(MockitoJUnitRunner.class)

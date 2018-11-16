@@ -1,4 +1,4 @@
-package com.github.mhdirkse.timewriter;
+package com.github.mhdirkse.timewriter.auth;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,6 +18,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Component;
 
+import com.github.mhdirkse.timewriter.model.LoginRequest;
 import com.google.gson.Gson;
 
 @Component

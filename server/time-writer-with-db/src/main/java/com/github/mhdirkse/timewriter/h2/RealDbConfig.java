@@ -1,8 +1,11 @@
-package com.github.mhdirkse.timewriter.db;
+package com.github.mhdirkse.timewriter.h2;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+
+import com.github.mhdirkse.timewriter.h2.DataInitializerForH2;
+import com.github.mhdirkse.timewriter.h2.SecurityRefinerForH2;
 
 @Configuration
 class RealDbConfig {
@@ -10,5 +13,11 @@ class RealDbConfig {
     @Primary
     public SecurityRefinerForH2 securityRefinerForH2Noop() {
         return new SecurityRefinerForH2Noop();
+    }
+
+    @Bean
+    @Primary
+    public DataInitializerForH2 dataInitializerForH2Noop() {
+        return new DataInitializerForH2Noop();
     }
 }
