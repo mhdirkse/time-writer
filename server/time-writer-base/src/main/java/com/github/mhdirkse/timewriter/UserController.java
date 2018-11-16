@@ -65,7 +65,7 @@ public class UserController {
         if(!loggedUser.hasUser()) {
             return false;
         }
-        if(loggedUser.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
+        if(loggedUser.getAuthorities().contains(new SimpleGrantedAuthority(UserPrincipal.ROLE_ADMIN))) {
             return true;
         }
         return (user.getUsername().equals(loggedUser.getUsername()));
@@ -82,8 +82,16 @@ public class UserController {
         if(!isAuthorized(id, deletedUser.get(), loggedUser)) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
+        if(isDeletedUserAdmin(deletedUser.get())) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         userInfoRepository.delete(deletedUser.get());
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    private boolean isDeletedUserAdmin(UserInfo deletedUser) {
+        UserPrincipal user = new UserPrincipal(deletedUser);
+        return user.getAuthorities().contains(new SimpleGrantedAuthority(UserPrincipal.ROLE_ADMIN));
     }
 }
 

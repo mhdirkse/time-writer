@@ -38,8 +38,8 @@ public class AdminUserInitializer implements CommandLineRunner {
 
     private void addAdminUser() {
         UserInfo adminUser = new UserInfo();
-        adminUser.setUsername("admin");
-        adminUser.setPassword("admin");
+        adminUser.setUsername(UserPrincipal.ADMIN);
+        adminUser.setPassword(UserPrincipal.ADMIN);
         userController.addUser(adminUser);
     }
 }

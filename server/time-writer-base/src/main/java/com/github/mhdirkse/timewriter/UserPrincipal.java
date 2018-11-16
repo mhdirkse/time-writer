@@ -12,6 +12,10 @@ import com.github.mhdirkse.timewriter.model.UserInfo;
 
 public class UserPrincipal implements UserDetails {
     private static final long serialVersionUID = 2846857548165677180L;
+
+    public static final String ADMIN = "admin";
+    public static final String ROLE_ADMIN = "ROLE_ADMIN";
+
     private UserInfo user = null;
 
     public UserPrincipal() {
@@ -28,8 +32,8 @@ public class UserPrincipal implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
-        if(hasUser() && user.getUsername().equals("admin")) {
-            grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        if(hasUser() && user.getUsername().equals(ADMIN)) {
+            grantedAuthorities.add(new SimpleGrantedAuthority(ROLE_ADMIN));
         }
         return grantedAuthorities;
     }

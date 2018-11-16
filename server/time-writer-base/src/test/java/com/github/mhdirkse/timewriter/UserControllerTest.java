@@ -2,6 +2,7 @@ package com.github.mhdirkse.timewriter;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.never;
 
 import java.util.Optional;
 
@@ -19,7 +20,6 @@ import com.github.mhdirkse.timewriter.model.UserInfo;
 @RunWith(MockitoJUnitRunner.class)
 public class UserControllerTest {
     private static final String USERNAME = "username";
-    private static final String ADMIN = "admin";
 
     @Mock
     private UserInfoRepository userInfoRepository;
@@ -115,7 +115,7 @@ public class UserControllerTest {
         UserInfo savedModification = getUserInfoWithId(id);
         when(userInfoRepository.findById(id)).thenReturn(Optional.of(original));
         when(userInfoRepository.save(modification)).thenReturn(savedModification);
-        ResponseEntity<UserInfo> response = instance.modifyUser(id, modification, getPrincipal(ADMIN));
+        ResponseEntity<UserInfo> response = instance.modifyUser(id, modification, getPrincipal(UserPrincipal.ADMIN));
         Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assert.assertEquals(savedModification, response.getBody());
         verify(userInfoRepository).save(modification);        
@@ -126,7 +126,7 @@ public class UserControllerTest {
         long id = 1L;
         UserInfo original = getUserInfoWithId(id);
         when(userInfoRepository.findById(id)).thenReturn(Optional.<UserInfo>empty());
-        ResponseEntity<UserInfo> response = instance.modifyUser(id, original, getPrincipal(ADMIN));
+        ResponseEntity<UserInfo> response = instance.modifyUser(id, original, getPrincipal(UserPrincipal.ADMIN));
         Assert.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
@@ -162,7 +162,7 @@ public class UserControllerTest {
         long id = 1L;
         UserInfo userToDelete = getUserInfoWithId(id);
         when(userInfoRepository.findById(id)).thenReturn(Optional.<UserInfo>of(userToDelete));
-        ResponseEntity<UserInfo> response = instance.deleteUser(id, getPrincipal(ADMIN));
+        ResponseEntity<UserInfo> response = instance.deleteUser(id, getPrincipal(UserPrincipal.ADMIN));
         verify(userInfoRepository).delete(userToDelete);
         Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
     }
@@ -171,7 +171,26 @@ public class UserControllerTest {
     public void whenAdminTriesToDeleteNonexistentUserThenBadRequest() {
         long id = 1L;
         when(userInfoRepository.findById(id)).thenReturn(Optional.<UserInfo>empty());
-        ResponseEntity<UserInfo> response = instance.deleteUser(id,  getPrincipal(ADMIN));
+        ResponseEntity<UserInfo> response = instance.deleteUser(id,  getPrincipal(UserPrincipal.ADMIN));
         Assert.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
+
+    @Test
+    public void whenAdminUserTriesToDeleteHimSelfThenError() {
+        long id = 1L;
+        UserInfo userToDelete = getAdminUser(id);
+        UserPrincipal principal = new UserPrincipal(userToDelete);
+        when(userInfoRepository.findById(id)).thenReturn(Optional.<UserInfo>of(userToDelete));
+        ResponseEntity<UserInfo> response = instance.deleteUser(id, principal);
+        verify(userInfoRepository, never()).delete(userToDelete);
+        Assert.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
+
+    private UserInfo getAdminUser(long id) {
+        UserInfo user = new UserInfo();
+        user.setUsername(UserPrincipal.ADMIN);
+        user.setPassword(UserPrincipal.ADMIN);
+        user.setId(id);
+        return user;
     }
 }
