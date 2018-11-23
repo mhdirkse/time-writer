@@ -12,6 +12,7 @@ functions:
 
 * POST to `/login`: Login, fill the body of the HTTP request with your credentials.
 It is a JSON like `{"username":"admin", "password":"admin"}`.
+* GET to `logout`: Logout.
 * POST to `/api/users`: Add user. Put the credentials in the body of the HTTP request.
 Modifying a user this way is an error. You can do this without
 being logged in.
