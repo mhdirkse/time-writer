@@ -1,8 +1,8 @@
 package com.github.mhdirkse.timewriter;
 
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.never;
 
 import java.util.Optional;
 
@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.github.mhdirkse.timewriter.model.UserInfo;
 
@@ -24,11 +25,14 @@ public class UserControllerTest {
     @Mock
     private UserInfoRepository userInfoRepository;
 
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
     private UserController instance;
 
     @Before
     public void setUp() {
-        instance = new UserController(userInfoRepository);
+        instance = new UserController(passwordEncoder, userInfoRepository);
     }
 
     @Test
@@ -43,13 +47,18 @@ public class UserControllerTest {
     @Test
     public void whenUserDoesNotExistThenUserAdded() {
         UserInfo newUser = getUserInfo();
+        UserInfo savedUser = getUserInfo();
+        savedUser.setPassword("encrypted");
         UserInfo addedUser = getUserInfo();
+        addedUser.setPassword("encrypted");
+        addedUser.setId(1L);
         when(userInfoRepository.findByUsername(USERNAME)).thenReturn(null);
-        when(userInfoRepository.save(newUser)).thenReturn(addedUser);
+        when(passwordEncoder.encode("password")).thenReturn("encrypted");
+        when(userInfoRepository.save(savedUser)).thenReturn(addedUser);
         ResponseEntity<UserInfo> response = instance.addUser(newUser);
         Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assert.assertEquals(addedUser, response.getBody());
-        verify(userInfoRepository).save(newUser);
+        verify(userInfoRepository).save(savedUser);
     }
 
     private UserInfo getUserInfo() {
@@ -61,9 +70,11 @@ public class UserControllerTest {
 
     @Test
     public void whenPathVariableDoesNotMatchUserThenUpdateFails() {
+        UserInfo orig = getUserInfo();
+        orig.setId(1L);
         UserInfo modification = getUserInfo();
-        modification.setId(1L);
-        ResponseEntity<UserInfo> response = instance.modifyUser(2L, modification, getPrincipal(USERNAME));
+        modification.setUsername("other");
+        ResponseEntity<UserInfo> response = instance.modifyUser(1L, modification, getPrincipal(USERNAME));
         Assert.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
@@ -77,14 +88,18 @@ public class UserControllerTest {
     public void whenUpdateRequestOkThenUpdated() {
         long id = 1L;
         UserInfo original = getUserInfoWithId(id);
-        UserInfo modification = getUserInfoWithId(id);
+        UserInfo modification = getUserInfo();
         UserInfo savedModification = getUserInfoWithId(id);
+        savedModification.setPassword("encrypted");
+        UserInfo addedModification = getUserInfoWithId(id);
+        addedModification.setPassword("encrypted");
         when(userInfoRepository.findById(id)).thenReturn(Optional.of(original));
-        when(userInfoRepository.save(modification)).thenReturn(savedModification);
+        when(passwordEncoder.encode("password")).thenReturn("encrypted");
+        when(userInfoRepository.save(savedModification)).thenReturn(addedModification);
         ResponseEntity<UserInfo> response = instance.modifyUser(id, modification, getPrincipal(USERNAME));
         Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
-        Assert.assertEquals(savedModification, response.getBody());
-        verify(userInfoRepository).save(modification);
+        Assert.assertEquals(addedModification, response.getBody());
+        verify(userInfoRepository).save(savedModification);
     }
 
     @Test
@@ -92,7 +107,7 @@ public class UserControllerTest {
         long id = 1L;
         UserInfo original = getUserInfoWithId(id);
         when(userInfoRepository.findById(id)).thenReturn(Optional.of(original));
-        UserInfo modification = getUserInfoWithId(id);
+        UserInfo modification = getUserInfo();
         ResponseEntity<UserInfo> response = instance.modifyUser(id, modification, new UserPrincipal());
         Assert.assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
     }
@@ -101,7 +116,7 @@ public class UserControllerTest {
     public void whenUpdateUserDiffersFromPrincipalThenUpdateFails() {
         long id = 1L;
         UserInfo original = getUserInfoWithId(id);
-        UserInfo modification = getUserInfoWithId(id);
+        UserInfo modification = getUserInfo();
         when(userInfoRepository.findById(id)).thenReturn(Optional.<UserInfo>of(original));
         ResponseEntity<UserInfo> response = instance.modifyUser(id, modification, getPrincipal("different"));
         Assert.assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
@@ -111,22 +126,26 @@ public class UserControllerTest {
     public void whenAdminLoggedInThenAnyUserCanBeUpdated() {
         long id = 1L;
         UserInfo original = getUserInfoWithId(id);
-        UserInfo modification = getUserInfoWithId(id);
+        UserInfo modification = getUserInfo();
         UserInfo savedModification = getUserInfoWithId(id);
+        savedModification.setPassword("encrypted");
+        UserInfo addedModification = getUserInfoWithId(id);
+        addedModification.setPassword("encrypted");
         when(userInfoRepository.findById(id)).thenReturn(Optional.of(original));
-        when(userInfoRepository.save(modification)).thenReturn(savedModification);
+        when(passwordEncoder.encode("password")).thenReturn("encrypted");
+        when(userInfoRepository.save(savedModification)).thenReturn(addedModification);
         ResponseEntity<UserInfo> response = instance.modifyUser(id, modification, getPrincipal(UserPrincipal.ADMIN));
         Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
-        Assert.assertEquals(savedModification, response.getBody());
-        verify(userInfoRepository).save(modification);        
+        Assert.assertEquals(addedModification, response.getBody());
+        verify(userInfoRepository).save(savedModification);        
     }
 
     @Test
     public void whenAdminTriesToUpdateNonexistentUserThenBadRequest() {
         long id = 1L;
-        UserInfo original = getUserInfoWithId(id);
+        UserInfo modification = getUserInfo();
         when(userInfoRepository.findById(id)).thenReturn(Optional.<UserInfo>empty());
-        ResponseEntity<UserInfo> response = instance.modifyUser(id, original, getPrincipal(UserPrincipal.ADMIN));
+        ResponseEntity<UserInfo> response = instance.modifyUser(id, modification, getPrincipal(UserPrincipal.ADMIN));
         Assert.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 

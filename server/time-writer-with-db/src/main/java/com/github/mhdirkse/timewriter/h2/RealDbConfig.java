@@ -3,9 +3,8 @@ package com.github.mhdirkse.timewriter.h2;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-
-import com.github.mhdirkse.timewriter.h2.DataInitializerForH2;
-import com.github.mhdirkse.timewriter.h2.SecurityRefinerForH2;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 class RealDbConfig {
@@ -19,5 +18,11 @@ class RealDbConfig {
     @Primary
     public DataInitializerForH2 dataInitializerForH2Noop() {
         return new DataInitializerForH2Noop();
+    }
+
+    @Bean
+    @Primary
+    public PasswordEncoder passwordEncoderReal() {
+        return new BCryptPasswordEncoder();
     }
 }
