@@ -64,7 +64,15 @@
               <filtering>true</filtering>
               <targetPath>WEB-INF</targetPath>
             </resource>
+            <resource>
+              <directory>${basedir}/src/main/resources</directory>
+              <filtering>true</filtering>
+              <targetPath>WEB-INF/classes</targetPath>
+            </resource>
           </webResources>
+          <filters>
+            <filter>credentials.properties</filter>
+          </filters>
         </configuration>
       </plugin>
       <plugin>
