@@ -1,19 +1,24 @@
 package com.github.mhdirkse.timewriter.model;
 
+import java.io.Serializable;
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.Serializable;
-
 @Entity
-@Table(name = "users")
+@Table(name = "Users")
 @Getter
 @Setter
 public class UserInfo implements Serializable {
@@ -58,12 +63,25 @@ public class UserInfo implements Serializable {
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    @Column
     private Long id;
 
     @Column(nullable = false, unique = true)
     private String username;
 
-    @Column
     private String password;
+
+    @OneToMany(
+            mappedBy="userId",
+            cascade=CascadeType.REMOVE)
+    @JsonIgnore
+    private List<TimeNote> timeNotes;
+
+    public UserInfo() {
+    }
+
+    public UserInfo(UserInfo other) {
+        this.id = other.id;
+        this.username = other.username;
+        this.password = other.password;
+    }
 }

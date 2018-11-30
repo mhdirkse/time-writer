@@ -25,6 +25,9 @@ public class AdminUserInitializerTest {
     private UserController userController;
 
     @Mock
+    private TimeNoteController timeNoteController;
+
+    @Mock
     private DataInitializerForH2 dataInitializerForH2;
 
     @InjectMocks
@@ -36,7 +39,7 @@ public class AdminUserInitializerTest {
         when(userController.addUser(any())).thenReturn(new ResponseEntity<UserInfo>(HttpStatus.OK));
         instance.run();
         verify(userController).addUser(any());
-        verify(dataInitializerForH2).addData(userController);
+        verify(dataInitializerForH2).addData(userController, timeNoteController);
     }
 
     @Test
@@ -44,6 +47,6 @@ public class AdminUserInitializerTest {
         when(userRepository.count()).thenReturn(1L);
         instance.run();
         verify(userController, never()).addUser(any());
-        verify(dataInitializerForH2, never()).addData(any());
+        verify(dataInitializerForH2, never()).addData(any(), any());
     }
 }

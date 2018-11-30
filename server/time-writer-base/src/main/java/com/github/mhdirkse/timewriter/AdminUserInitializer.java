@@ -13,6 +13,7 @@ import com.github.mhdirkse.timewriter.model.UserInfo;
 public class AdminUserInitializer implements CommandLineRunner {
     private UserInfoRepository userRepository;
     private UserController userController;
+    private TimeNoteController timeNoteController;
     private DataInitializerForH2 dataInitializerForH2;
 
     private Logger logger = LoggerFactory.getLogger(AdminUserInitializer.class);
@@ -20,9 +21,11 @@ public class AdminUserInitializer implements CommandLineRunner {
     AdminUserInitializer(
             UserInfoRepository userRepository,
             UserController userController,
+            TimeNoteController timeNoteController,
             DataInitializerForH2 dataInitializerForH2) {
         this.userRepository = userRepository;
         this.userController = userController;
+        this.timeNoteController = timeNoteController;
         this.dataInitializerForH2 = dataInitializerForH2;
     }
 
@@ -32,7 +35,7 @@ public class AdminUserInitializer implements CommandLineRunner {
         logger.debug("Putting initial data if userRepository empty");
         if(userRepository.count() == 0) {
             addAdminUser();
-            dataInitializerForH2.addData(userController);
+            dataInitializerForH2.addData(userController, timeNoteController);
         }
     }
 

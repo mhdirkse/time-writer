@@ -29,6 +29,10 @@ public class UserPrincipal implements UserDetails {
         return user != null;
     }
 
+    public Long getId() {
+        return user.getId();
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
