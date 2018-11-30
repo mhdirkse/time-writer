@@ -17,20 +17,20 @@ It is a JSON like `{"username":"admin", "password":"admin"}`.
 * POST to `/api/users`: Add user. Put the credentials in the body of the HTTP request.
 Modifying a user this way is an error. You can do this without
 being logged in.
-* PUT to `/api/users/&lt;user id&gt;`: Modify user. The id, the username and the new password
+* PUT to `/api/users/<user id>`: Modify user. The id, the username and the new password
 are in the body of the HTTP request. Only allowed if the user being modified
 is logged in, or if user `admin` is logged in.
-* DELETE to `/api/users/&lt;user id&gt;`: Delete user. Only allowed if the deleted
+* DELETE to `/api/users/<user id>`: Delete user. Only allowed if the deleted
 user is logged in, or if user `admin` is logged in.
-* GET to `/api/timenotes/&lt;start time&gt;/&lt;end time&gt;. Get all notes for the logged-in user
+* GET to `/api/timenotes/<start time>/<end time>`. Get all notes for the logged-in user
 with timestamp between start and end time, which are seconds since Epoch. Only allowed
 is someone is logged in.
 * POST to `/api/timenotes`. Add time note. The body needs to have properties `userId`,
 `timestamp` and `message`. The `userId` must be the id of the logged-in user. Only
 allowed if someone is logged in.
-* PUT to `/api/timenotes/&lt;id&gt;`. Modify time note with given id. The body needs to have
+* PUT to `/api/timenotes/<id>`. Modify time note with given id. The body needs to have
 the same properties as for creating notes and also the `id` property must be present.
-* DELETE to `/api/timenotes/&lt;id&gt;`. Delete time note. Only allowed if the user of the note
+* DELETE to `/api/timenotes/<id>`. Delete time note. Only allowed if the user of the note
 is the logged-in user.
 
 # Usage
