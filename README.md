@@ -36,15 +36,16 @@ is the logged-in user.
 # Usage
 * Clone this project to your local PC. You need Java 8 and Maven before you can
 proceed.
-* Make a Google project and add a Cloud SQL database to it. Initialize your database
+* Make a Google project and add a Cloud SQL database to it. Name it "users". Initialize your database
 using the `db/dbInit.sql` script.
-* Under `server/time-writer-with-db`, add a file `credentials.properties`. The
+* Under `time-writer-with-db`, add a file `credentials.properties`. The
 contents should be like:
 ```
 googleProject=<google project id>
+googleRegion=<region of Cloud SQL database>
 dbpassword=<root password of Cloud SQL database>
 ```
-* Probably you need to modify the connection URL in applicationp.properties
+* You may need to modify the connection URL in applicationp.properties
 to match your Google project.
 * Build from the root directory of your checkout using `mvn clean install`.
 * Enter `server/time-writer-with-db`. Deploy using `mvn appengine:deploy`.
